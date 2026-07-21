@@ -4,11 +4,20 @@ import json
 from dotenv import load_dotenv
 from google import genai
 
+try:
+    import streamlit as st
+except ImportError:
+    st = None
+
 load_dotenv()
 
-client = genai.Client(
-    api_key=os.getenv("GEMINI_API_KEY")
-)
+api_key = os.getenv("GEMINI_API_KEY")
+
+# Fallback to Streamlit Secrets when deployed
+if not api_key and st is not None:
+    api_key = st.secrets["GEMINI_API_KEY"]
+
+client = genai.Client(api_key=api_key)
 
 
 def generate_response(question: str):
